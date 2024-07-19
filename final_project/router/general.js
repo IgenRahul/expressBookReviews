@@ -7,7 +7,20 @@ const public_users = express.Router();
 
 public_users.post("/register", (req, res) => {
     //Write your code here
-    return res.status(300).json({ message: "Yet to be implemented" });
+    const db = isValid(req.body.username);
+    let note = 'is not valid (2 to 8 characters, lowercase or numbers)'
+        , code = 401
+        ;
+    if (db === 0) note = 'is unavailable';
+    else if (db === 1) {
+        code = 200;
+        users.push({
+            username: req.body.username,
+            password: req.body.password
+        });
+        note = 'successfully registered, you can login'
+    }
+    return res.status(code).json({ message: `${req.body.username} ${note}` })
 });
 
 // Get the book list available in the shop
@@ -35,8 +48,8 @@ public_users.get('/author/:author', function (req, res) {
     //Write your code here
     let author = req.params.author;
     let result;
-    for(id in db){
-        if(db[id]["author"] === author){
+    for (id in db) {
+        if (db[id]["author"] === author) {
             result = db[id];
         }
     }
@@ -53,8 +66,8 @@ public_users.get('/title/:title', function (req, res) {
     //Write your code here
     let title = req.params.title;
     let result;
-    for(id in db){
-        if(db[id]["title"] === title){
+    for (id in db) {
+        if (db[id]["title"] === title) {
             result = db[id];
         }
     }
@@ -69,7 +82,11 @@ public_users.get('/title/:title', function (req, res) {
 //  Get book review
 public_users.get('/review/:isbn', function (req, res) {
     //Write your code here
-    return res.status(300).json({ message: "Yet to be implemented" });
+    let isbn = req.params.isbn;
+    if (db.hasOwnProperty(isbn)) {
+        return res.status(200).json(db[isbn].reviews);
+    }
+    return res.status(404).json({ message: "NOT Found" });
 });
 
 module.exports.general = public_users;
